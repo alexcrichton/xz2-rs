@@ -8,7 +8,7 @@ use futures::Poll;
 #[cfg(feature = "tokio")]
 use tokio_io::{AsyncRead, AsyncWrite};
 
-use stream::{Stream, Check, Action};
+use stream::{Stream, Status, Check, Action};
 
 /// An xz encoder, or compressor.
 ///
@@ -204,8 +204,7 @@ impl<R: BufRead> Read for XzDecoder<R> {
             }
             self.obj.consume(consumed);
 
-            try!(ret);
-            if read > 0 || eof || buf.len() == 0 {
+            if Status::StreamEnd == try!(ret) || read > 0 || eof || buf.len() == 0 {
                 return Ok(read)
             }
         }
