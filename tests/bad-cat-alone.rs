@@ -1,0 +1,36 @@
+extern crate xz2;
+
+use std::io;
+use std::thread;
+use std::time;
+
+use std::sync::mpsc::channel;
+
+use std::io::Read;
+
+// <bad-0cat-alone.xz xxd -i
+const DATA: &'static [u8] =
+    &[  0xfd, 0x37, 0x7a, 0x58, 0x5a, 0x00, 0x00, 0x01, 0x69, 0x22, 0xde, 0x36,
+        0x00, 0x00, 0x00, 0x00, 0x1c, 0xdf, 0x44, 0x21, 0x90, 0x42, 0x99, 0x0d,
+        0x01, 0x00, 0x00, 0x00, 0x00, 0x01, 0x59, 0x5a, 0x5d, 0x00, 0x00, 0x01,
+        0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x83, 0xff,
+        0xfb, 0xff, 0xff, 0xc0, 0x00, 0x00, 0x00
+    ];
+
+
+#[test]
+fn decode_bad_data_from_cursor() {
+    let (tx, rx) = channel();
+
+    let t = thread::spawn(move || {
+        let mut decoder = xz2::bufread::XzDecoder::new(io::Cursor::new(DATA));
+        let mut buf = [0u8; 10];
+        assert_eq!(io::ErrorKind::Other, decoder.read(&mut buf[..]).unwrap_err().kind());
+        tx.send(()).unwrap();
+    });
+
+    rx.recv_timeout(time::Duration::new(5, 0))
+        .expect("test should take no time at all; not hang");
+
+    t.join().expect("no panic in thread");
+}
