@@ -2,6 +2,7 @@
 
 use std::io::prelude::*;
 use std::io;
+use lzma_sys;
 
 #[cfg(feature = "tokio")]
 use futures::Poll;
@@ -141,9 +142,16 @@ impl<R: AsyncWrite> AsyncWrite for XzEncoder<R> {
 
 impl<R: BufRead> XzDecoder<R> {
     /// Creates a new decoder which will decompress data read from the given
-    /// stream.
+    /// stream. Input can contain several concatenated xz streams.
     pub fn new(r: R) -> XzDecoder<R> {
-        let stream = Stream::new_stream_decoder(u64::max_value(), 0).unwrap();
+        let stream = Stream::new_auto_decoder(u64::max_value(), lzma_sys::LZMA_CONCATENATED).unwrap();
+        XzDecoder::new_stream(r, stream)
+    }
+
+    /// Creates a new decoder which will decompress data read from the given
+    /// stream. Flags such as `CONCATENATED` can be provided to configure the decompression.
+    pub fn new_with_opt(r: R, flags: u32) -> XzDecoder<R> {
+        let stream = Stream::new_stream_decoder(u64::max_value(), flags).unwrap();
         XzDecoder::new_stream(r, stream)
     }
 
@@ -198,13 +206,13 @@ impl<R: BufRead> Read for XzDecoder<R> {
                 eof = input.is_empty();
                 let before_out = self.data.total_out();
                 let before_in = self.data.total_in();
-                ret = self.data.process(input, buf, Action::Run);
+                ret = self.data.process(input, buf, if eof { Action::Finish } else { Action::Run });
                 read = (self.data.total_out() - before_out) as usize;
                 consumed = (self.data.total_in() - before_in) as usize;
             }
             self.obj.consume(consumed);
 
-            let status = try!(ret);
+            let status = ret?;
             if read > 0 || eof || buf.len() == 0 {
                 if read == 0 && status != Status::StreamEnd && buf.len() > 0 {
                     return Err(io::Error::new(io::ErrorKind::Other,

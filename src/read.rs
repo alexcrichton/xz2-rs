@@ -111,10 +111,19 @@ impl<R: AsyncWrite + Read> AsyncWrite for XzEncoder<R> {
 
 impl<R: Read> XzDecoder<R> {
     /// Create a new decompression stream, which will read compressed
-    /// data from the given input stream and decompress it.
+    /// data from the given input stream and decompress it. Input
+    /// can contain several concatenated xz streams.
     pub fn new(r: R) -> XzDecoder<R> {
         XzDecoder {
             inner: bufread::XzDecoder::new(BufReader::new(r)),
+        }
+    }
+    /// Create a new decompression stream, which will read compressed
+    /// data from the given input stream and decompress it. Flags
+    /// such as `CONCATENATED` can be provided to configure the decompression.
+    pub fn new_with_opt(r: R, flags: u32) -> XzDecoder<R> {
+        XzDecoder {
+            inner: bufread::XzDecoder::new_with_opt(BufReader::new(r), flags),
         }
     }
 
@@ -242,7 +251,7 @@ mod tests {
             result.extend(v.iter().map(|x| *x));
         }
 
-        let mut d = XzDecoder::new(&result[..]);
+        let mut d = XzDecoder::new_with_opt(&result[..], 0);
         let mut data = Vec::with_capacity(m.len());
         unsafe { data.set_len(m.len()); }
         assert!(d.read(&mut data).unwrap() == m.len());
