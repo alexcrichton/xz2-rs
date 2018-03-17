@@ -2,6 +2,7 @@
 
 use std::io::prelude::*;
 use std::io;
+use lzma_sys;
 
 #[cfg(feature = "tokio")]
 use futures::Poll;
@@ -176,7 +177,7 @@ impl<W: Write> XzDecoder<W> {
     /// Creates a new decoding stream which will decode all input written to it
     /// into `obj`.
     pub fn new(obj: W) -> XzDecoder<W> {
-        let stream = Stream::new_stream_decoder(u64::max_value(), 0).unwrap();
+        let stream = Stream::new_stream_decoder(u64::max_value(), lzma_sys::LZMA_CONCATENATED).unwrap();
         XzDecoder::new_stream(obj, stream)
     }
 
@@ -218,7 +219,7 @@ impl<W: Write> XzDecoder<W> {
         loop {
             try!(self.dump());
             let res = try!(self.data.process_vec(&[], &mut self.buf,
-                                                 Action::Run));
+                                                 Action::Finish));
 
             // When decoding a truncated file, XZ returns LZMA_BUF_ERROR and
             // decodes no new data, which corresponds to this crate's MemNeeded
