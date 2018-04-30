@@ -23,17 +23,6 @@ fn standard_files() {
             continue
         }
 
-        // These seem to be concatenated streams which we don't support yet
-        if filename.contains("good-0pad-empty") {
-            continue
-        }
-        if filename.contains("good-0catpad-empty") {
-            continue
-        }
-        if filename.contains("good-0cat-empty") {
-            continue
-        }
-
         println!("testing {:?}", file.path());
         let mut contents = Vec::new();
         File::open(&file.path()).unwrap().read_to_end(&mut contents).unwrap();
@@ -47,8 +36,8 @@ fn standard_files() {
 
 fn test_good(data: &[u8]) {
     let mut ret = Vec::new();
-    read::XzDecoder::new(data).read_to_end(&mut ret).unwrap();
-    let mut w = write::XzDecoder::new(ret);
+    read::XzDecoder::new_multi_decoder(data).read_to_end(&mut ret).unwrap();
+    let mut w = write::XzDecoder::new_multi_decoder(ret);
     w.write_all(data).unwrap();
     w.finish().unwrap();
 }

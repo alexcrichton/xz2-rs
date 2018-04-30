@@ -111,10 +111,20 @@ impl<R: AsyncWrite + Read> AsyncWrite for XzEncoder<R> {
 
 impl<R: Read> XzDecoder<R> {
     /// Create a new decompression stream, which will read compressed
-    /// data from the given input stream and decompress it.
+    /// data from the given input stream, and decompress one xz stream.
+    /// It may also consume input data that follows the xz stream.
+    /// Use [`xz::bufread::XzDecoder`] instead to process a mix of xz and non-xz data.
     pub fn new(r: R) -> XzDecoder<R> {
         XzDecoder {
             inner: bufread::XzDecoder::new(BufReader::new(r)),
+        }
+    }
+
+    /// Create a new decompression stream, which will read compressed
+    /// data from the given input and decompress all the xz stream it contains.
+    pub fn new_multi_decoder(r: R) -> XzDecoder<R> {
+        XzDecoder {
+            inner: bufread::XzDecoder::new_multi_decoder(BufReader::new(r)),
         }
     }
 
@@ -285,6 +295,47 @@ mod tests {
             let mut v2 = Vec::new();
             r.read_to_end(&mut v2).unwrap();
             v == v2
+        }
+    }
+
+    #[test]
+    fn two_streams() {
+        let mut input_stream1: Vec<u8> = Vec::new();
+        let mut input_stream2: Vec<u8> = Vec::new();
+        let mut all_input : Vec<u8> = Vec::new();
+
+        // Generate input data.
+        const STREAM1_SIZE: usize = 1024;
+        for num in 0..STREAM1_SIZE {
+            input_stream1.push(num as u8)
+        }
+        const STREAM2_SIZE: usize = 532;
+        for num in 0..STREAM2_SIZE {
+            input_stream2.push((num + 32) as u8)
+        }
+        all_input.extend(&input_stream1);
+        all_input.extend(&input_stream2);
+
+        // Make a vector with compressed data
+        let mut decoder_input = Vec::new();
+        {
+            let mut encoder = XzEncoder::new(&input_stream1[..], 6);
+            encoder.read_to_end(&mut decoder_input).unwrap();
+        }
+        {
+            let mut encoder = XzEncoder::new(&input_stream2[..], 6);
+            encoder.read_to_end(&mut decoder_input).unwrap();
+        }
+
+        // Decoder must be able to read the 2 concatenated xz streams and get the same data as input.
+        let mut decoder_reader = &decoder_input[..];
+        {
+            // using `XzDecoder::new` here would fail because only 1 xz stream would be processed.
+            let mut decoder = XzDecoder::new_multi_decoder(&mut decoder_reader);
+            let mut decompressed_data = vec![0u8; all_input.len()];
+
+            assert_eq!(decoder.read(&mut decompressed_data).unwrap(), all_input.len());
+            assert_eq!(decompressed_data, &all_input[..]);
         }
     }
 }

@@ -2,6 +2,7 @@
 
 use std::io::prelude::*;
 use std::io;
+use lzma_sys;
 
 #[cfg(feature = "tokio")]
 use futures::Poll;
@@ -147,6 +148,13 @@ impl<R: BufRead> XzDecoder<R> {
         XzDecoder::new_stream(r, stream)
     }
 
+    /// Creates a new decoder which will decompress data read from the given
+    /// input. All the concatenated xz streams from input will be consumed.
+    pub fn new_multi_decoder(r: R) -> XzDecoder<R> {
+        let stream = Stream::new_auto_decoder(u64::max_value(), lzma_sys::LZMA_CONCATENATED).unwrap();
+        XzDecoder::new_stream(r, stream)
+    }
+
     /// Creates a new decoder with a custom `Stream`.
     ///
     /// The `Stream` can be pre-configured for various checks, different
@@ -198,13 +206,13 @@ impl<R: BufRead> Read for XzDecoder<R> {
                 eof = input.is_empty();
                 let before_out = self.data.total_out();
                 let before_in = self.data.total_in();
-                ret = self.data.process(input, buf, Action::Run);
+                ret = self.data.process(input, buf, if eof { Action::Finish } else { Action::Run });
                 read = (self.data.total_out() - before_out) as usize;
                 consumed = (self.data.total_in() - before_in) as usize;
             }
             self.obj.consume(consumed);
 
-            let status = try!(ret);
+            let status = ret?;
             if read > 0 || eof || buf.len() == 0 {
                 if read == 0 && status != Status::StreamEnd && buf.len() > 0 {
                     return Err(io::Error::new(io::ErrorKind::Other,
@@ -238,5 +246,48 @@ impl<W: Write> Write for XzDecoder<W> {
 impl<R: AsyncWrite> AsyncWrite for XzDecoder<R> {
     fn shutdown(&mut self) -> Poll<(), io::Error> {
         self.get_mut().shutdown()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use bufread::{XzEncoder, XzDecoder};
+    use std::io::Read;
+
+    #[test]
+    fn compressed_and_trailing_data() {
+        // Make a vector with compressed data...
+        let mut to_compress : Vec<u8> = Vec::new();
+        const COMPRESSED_ORIG_SIZE: usize = 1024;
+        for num in 0..COMPRESSED_ORIG_SIZE {
+            to_compress.push(num as u8)
+        }
+        let mut encoder = XzEncoder::new(&to_compress[..], 6);
+
+        let mut decoder_input = Vec::new();
+        encoder.read_to_end(&mut decoder_input).unwrap();
+
+        // ...plus additional unrelated trailing data
+        const ADDITIONAL_SIZE : usize = 123;
+        let mut additional_data = Vec::new();
+        for num in 0..ADDITIONAL_SIZE {
+            additional_data.push(((25 + num) % 256) as u8)
+        }
+        decoder_input.extend(&additional_data);
+
+        // Decoder must be able to read the compressed xz stream, and keep the trailing data.
+        let mut decoder_reader = &decoder_input[..];
+        {
+            let mut decoder = XzDecoder::new(&mut decoder_reader);
+            let mut decompressed_data = vec![0u8; to_compress.len()];
+
+            assert_eq!(decoder.read(&mut decompressed_data).unwrap(), COMPRESSED_ORIG_SIZE);
+            assert_eq!(decompressed_data, &to_compress[..]);
+        }
+
+        let mut remaining_data = Vec::new();
+        let nb_read = decoder_reader.read_to_end(&mut remaining_data).unwrap();
+        assert_eq!(nb_read, ADDITIONAL_SIZE);
+        assert_eq!(remaining_data, &additional_data[..]);
     }
 }
