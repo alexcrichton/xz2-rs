@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{fs, io::Read, path::PathBuf};
 use tar::Archive;
 use xz2::read::XzDecoder;
 
@@ -12,4 +12,8 @@ fn unpack_tar_xz(archive_path: &PathBuf, dest: &PathBuf) {
     // We've decompressed the .xz; now unpack the tar.
     let mut archive = Archive::new(&tar[..]);
     archive.unpack(dest).expect("Problem unpacking tar");
+}
+
+fn main() {
+    
 }

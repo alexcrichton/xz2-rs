@@ -18,6 +18,7 @@ edition = "2018"
 [workspace]
 members = ["systest"]
 
+
 [dependencies]
 lzma-sys = { path = "lzma-sys", version = "0.1.11" }
 tokio-io = { version = "0.1.12", optional = true }
@@ -26,6 +27,7 @@ futures = { version = "0.1.26", optional = true }
 [dev-dependencies]
 rand = "0.7.0"
 quickcheck = "0.9.0"
+tar = "0.4.26"
 tokio-core = "0.1.17"
 
 [features]
