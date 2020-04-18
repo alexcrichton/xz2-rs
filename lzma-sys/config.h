@@ -38,3 +38,8 @@
     #define _POSIX_C_SOURCE 199506L
     #define MYTHREAD_POSIX 1
 #endif
+
+#if defined(__sun)
+    #define HAVE_CLOCK_GETTIME 1
+    #define HAVE_DECL_CLOCK_MONOTONIC 1
+#endif
