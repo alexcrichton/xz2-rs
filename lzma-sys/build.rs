@@ -7,8 +7,9 @@ const SKIP_FILENAMES: &[&str] = &["crc32_small", "crc64_small"];
 fn main() {
     let target = env::var("TARGET").unwrap();
 
+    println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-env-changed=LZMA_API_STATIC");
-    let want_static = env::var("LZMA_API_STATIC").is_ok();
+    let want_static = cfg!(feature = "static") || env::var("LZMA_API_STATIC").is_ok();
     let msvc = target.contains("msvc");
 
     // If a static link is desired, we compile from source.

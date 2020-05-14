@@ -19,7 +19,7 @@ edition = "2018"
 members = ["systest"]
 
 [dependencies]
-lzma-sys = { path = "lzma-sys", version = "0.1.11" }
+lzma-sys = { path = "lzma-sys", version = "0.1.15" }
 tokio-io = { version = "0.1.12", optional = true }
 futures = { version = "0.1.26", optional = true }
 

@@ -23,3 +23,6 @@ libc = "0.2.51"
 [build-dependencies]
 cc = "1.0.34"
 pkg-config = "0.3.14"
+
+[features]
+static = []
