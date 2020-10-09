@@ -1,6 +1,6 @@
 [package]
 name = "lzma-sys"
-version = "0.1.16"
+version = "0.1.17"
 authors = ["Alex Crichton <alex@alexcrichton.com>"]
 build = "build.rs"
 links = "lzma"
