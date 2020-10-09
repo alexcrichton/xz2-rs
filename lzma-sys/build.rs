@@ -22,6 +22,8 @@ fn main() {
         return;
     }
 
+    let out_dir = env::var("OUT_DIR").unwrap();
+    println!("cargo:root={}", out_dir);
     let include_dir = env::current_dir().unwrap().join("xz-5.2/src/liblzma/api");
     println!("cargo:include={}", include_dir.display());
 
