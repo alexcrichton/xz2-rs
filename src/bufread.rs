@@ -225,7 +225,10 @@ impl<R: BufRead> Read for XzDecoder<R> {
                 return Ok(read);
             }
             if consumed == 0 {
-                return Err(io::Error::new(io::ErrorKind::Other, "corrupt xz stream"));
+                return Err(io::Error::new(
+                    io::ErrorKind::Other,
+                    "corrupt xz stream. use new_multi_decoder if this is a multi-stream",
+                ));
             }
         }
     }
