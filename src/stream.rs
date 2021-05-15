@@ -816,7 +816,18 @@ fn cvt(rc: lzma_sys::lzma_ret) -> Result<Status, Error> {
 
 impl From<Error> for io::Error {
     fn from(e: Error) -> io::Error {
-        io::Error::new(io::ErrorKind::Other, e)
+        let kind = match e {
+            Error::Data => std::io::ErrorKind::InvalidData,
+            Error::Options => std::io::ErrorKind::InvalidInput,
+            Error::Format => std::io::ErrorKind::InvalidData,
+            Error::MemLimit => std::io::ErrorKind::Other,
+            Error::Mem => std::io::ErrorKind::Other,
+            Error::Program => std::io::ErrorKind::Other,
+            Error::NoCheck => std::io::ErrorKind::InvalidInput,
+            Error::UnsupportedCheck => std::io::ErrorKind::Other,
+        };
+
+        io::Error::new(kind, e)
     }
 }
 
@@ -824,7 +835,16 @@ impl error::Error for Error {}
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        "lzma data error".fmt(f)
+        match self {
+            Error::Data => "lzma data error",
+            Error::Options => "invalid options",
+            Error::Format => "stream/file format not recognized",
+            Error::MemLimit => "memory limit reached",
+            Error::Mem => "can't allocate memory",
+            Error::Program => "liblzma internal error",
+            Error::NoCheck => "no integrity check was available",
+            Error::UnsupportedCheck => "liblzma not built with check support"
+        }.fmt(f)
     }
 }
 

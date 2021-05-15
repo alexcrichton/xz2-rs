@@ -220,12 +220,12 @@ impl<R: BufRead> Read for XzDecoder<R> {
             let status = ret?;
             if read > 0 || eof || buf.len() == 0 {
                 if read == 0 && status != Status::StreamEnd && buf.len() > 0 {
-                    return Err(io::Error::new(io::ErrorKind::Other, "premature eof"));
+                    return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "premature eof"));
                 }
                 return Ok(read);
             }
             if consumed == 0 {
-                return Err(io::Error::new(io::ErrorKind::Other, "corrupt xz stream"));
+                return Err(io::Error::new(io::ErrorKind::InvalidData, "corrupt xz stream"));
             }
         }
     }
