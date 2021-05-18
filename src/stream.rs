@@ -843,8 +843,9 @@ impl fmt::Display for Error {
             Error::Mem => "can't allocate memory",
             Error::Program => "liblzma internal error",
             Error::NoCheck => "no integrity check was available",
-            Error::UnsupportedCheck => "liblzma not built with check support"
-        }.fmt(f)
+            Error::UnsupportedCheck => "liblzma not built with check support",
+        }
+        .fmt(f)
     }
 }
 
