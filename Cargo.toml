@@ -30,6 +30,7 @@ tokio-core = "0.1.17"
 
 [features]
 tokio = ["tokio-io", "futures"]
+static = ["lzma-sys/static"]
 
 [package.metadata.docs.rs]
 features = ["tokio-io", "futures"]
