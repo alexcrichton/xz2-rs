@@ -29,7 +29,7 @@
 //! the `tokio` feature of this crate:
 //!
 //! ```toml
-//! xz2 = { version = "0.3", features = ["tokio"] }
+//! xz2 = { version = "0.1.6", features = ["tokio"] }
 //! ```
 //!
 //! All methods are internally capable of working with streams that may return
