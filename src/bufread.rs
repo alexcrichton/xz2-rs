@@ -75,10 +75,10 @@ impl<R> XzEncoder<R> {
     ///
     /// Note that, due to buffering, this only bears any relation to
     /// total_in() when the compressor chooses to flush its data
-    /// (unfortunately, this won't happen this won't happen in general
-    /// at the end of the stream, because the compressor doesn't know
-    /// if there's more data to come).  At that point,
-    /// `total_out() / total_in()` would be the compression ratio.
+    /// (unfortunately, this won't happen in general at the end of the
+    /// stream, because the compressor doesn't know if there's more data
+    /// to come).  At that point, `total_out() / total_in()` would be
+    /// the compression ratio.
     pub fn total_out(&self) -> u64 {
         self.data.total_out()
     }
