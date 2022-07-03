@@ -58,7 +58,8 @@ fn main() {
         .include("xz-5.2/src/liblzma/common")
         .include("xz-5.2/src/liblzma/rangecoder")
         .include("xz-5.2/src/common")
-        .include(env::current_dir().unwrap());
+        .include(env::current_dir().unwrap())
+        .flag_if_supported("-flto=thin");
 
     if !target.ends_with("msvc") {
         build.flag("-std=c99").flag("-pthread");
