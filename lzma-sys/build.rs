@@ -27,7 +27,7 @@ fn main() {
     let include_dir = env::current_dir().unwrap().join("xz-5.2/src/liblzma/api");
     println!("cargo:include={}", include_dir.display());
 
-    let src_files = [
+    let mut src_files = [
         "xz-5.2/src/liblzma/common",
         "xz-5.2/src/liblzma/lzma",
         "xz-5.2/src/liblzma/lz",
@@ -41,7 +41,11 @@ fn main() {
     .chain(vec![
         "xz-5.2/src/common/tuklib_cpucores.c".into(),
         "xz-5.2/src/common/tuklib_physmem.c".into(),
-    ]);
+    ])
+    .collect::<Vec<_>>();
+
+    // sort to make build reproducible.
+    src_files.sort();
 
     let mut build = cc::Build::new();
 
