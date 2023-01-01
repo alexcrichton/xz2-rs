@@ -22,6 +22,14 @@
 //! decompressor.read_to_string(&mut contents).unwrap();
 //! assert_eq!(contents, "Hello, World!");
 //! ```
+//! # Static linking
+//!
+//! You can enable static-linking using the `static` feature, so that the XZ
+//! library is not required at runtime:
+//!
+//! ```toml
+//! xz2 = { version = "0.1.6", features = ["static"] }
+//! ```
 //!
 //! # Async I/O
 //!
