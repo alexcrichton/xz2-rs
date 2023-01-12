@@ -345,6 +345,20 @@ mod tests {
     }
 
     #[test]
+    fn trailing_data() {
+        let mut c = XzEncoder::new(Vec::new(), 6);
+        c.write_all(b"12834").unwrap();
+        let mut compressed = c.finish().unwrap();
+        compressed.extend(b"asdf");
+        let mut d = XzDecoder::new(Vec::new());
+        assert_eq!(d.write(&compressed).unwrap(), compressed.len() - 4);
+        assert_eq!(d.write(b"asdf").unwrap(), 0);
+        assert_eq!(d.write(b"asdf").unwrap(), 0);
+        let data = d.finish().unwrap();
+        assert_eq!(&data, b"12834");
+    }
+
+    #[test]
     fn qc() {
         ::quickcheck::quickcheck(test as fn(_) -> _);
 

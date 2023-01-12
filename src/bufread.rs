@@ -27,6 +27,7 @@ pub struct XzEncoder<R> {
 pub struct XzDecoder<R> {
     obj: R,
     data: Stream,
+    allow_trailing_data: bool,
 }
 
 impl<R: BufRead> XzEncoder<R> {
@@ -163,11 +164,21 @@ impl<R: BufRead> XzDecoder<R> {
         XzDecoder {
             obj: r,
             data: stream,
+            allow_trailing_data: false,
         }
     }
 }
 
 impl<R> XzDecoder<R> {
+    /// Configures whether to allow trailing data after the XZ stream.
+    ///
+    /// If true, additional data after the compressed XZ stream is ignored
+    /// and can be read from the underlying stream afterward.  If false,
+    /// such data produces an error.  Defaults to false.
+    pub fn allow_trailing_data(&mut self, allow: bool) {
+        self.allow_trailing_data = allow;
+    }
+
     /// Acquires a reference to the underlying stream
     pub fn get_ref(&self) -> &R {
         &self.obj
@@ -227,6 +238,9 @@ impl<R: BufRead> Read for XzDecoder<R> {
                 }
                 return Ok(read);
             }
+            if self.allow_trailing_data && status == Status::StreamEnd {
+                return Ok(read);
+            }
             if consumed == 0 {
                 return Err(io::Error::new(
                     io::ErrorKind::InvalidData,
@@ -284,21 +298,30 @@ mod tests {
         decoder_input.extend(&additional_data);
 
         // Decoder must be able to read the compressed xz stream, and keep the trailing data.
-        let mut decoder_reader = &decoder_input[..];
-        {
-            let mut decoder = XzDecoder::new(&mut decoder_reader);
-            let mut decompressed_data = vec![0u8; to_compress.len()];
+        for allow_trailing_data in [false, true] {
+            let mut decoder_reader = &decoder_input[..];
+            {
+                let mut decoder = XzDecoder::new(&mut decoder_reader);
+                decoder.allow_trailing_data(allow_trailing_data);
+                let mut decompressed_data = vec![0u8; to_compress.len() + 20];
 
-            assert_eq!(
-                decoder.read(&mut decompressed_data).unwrap(),
-                COMPRESSED_ORIG_SIZE
-            );
-            assert_eq!(decompressed_data, &to_compress[..]);
+                assert_eq!(
+                    decoder.read(&mut decompressed_data).unwrap(),
+                    COMPRESSED_ORIG_SIZE
+                );
+                assert_eq!(&decompressed_data[..COMPRESSED_ORIG_SIZE], &to_compress[..]);
+
+                if allow_trailing_data {
+                    assert_eq!(decoder.read(&mut decompressed_data).unwrap(), 0);
+                } else {
+                    decoder.read(&mut decompressed_data).unwrap_err();
+                }
+            }
+
+            let mut remaining_data = Vec::new();
+            let nb_read = decoder_reader.read_to_end(&mut remaining_data).unwrap();
+            assert_eq!(nb_read, ADDITIONAL_SIZE);
+            assert_eq!(remaining_data, &additional_data[..]);
         }
-
-        let mut remaining_data = Vec::new();
-        let nb_read = decoder_reader.read_to_end(&mut remaining_data).unwrap();
-        assert_eq!(nb_read, ADDITIONAL_SIZE);
-        assert_eq!(remaining_data, &additional_data[..]);
     }
 }
