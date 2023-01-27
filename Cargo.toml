@@ -35,5 +35,7 @@ static = ["lzma-sys/static"]
 fat-lto = ["lzma-sys/fat-lto"]
 thin-lto = ["lzma-sys/thin-lto"]
 
+thin = ["lzma-sys/thin"]
+
 [package.metadata.docs.rs]
 features = ["tokio-io", "futures"]

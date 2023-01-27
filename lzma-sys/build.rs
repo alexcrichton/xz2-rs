@@ -91,6 +91,10 @@ fn main() {
         }
     }
 
+    if cfg!(feature = "thin") {
+        build.define("HAVE_SMALL", Some("1"));
+    }
+
     build.compile("liblzma.a");
 }
 
