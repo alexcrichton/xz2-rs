@@ -8,7 +8,7 @@ use xz2::write;
 
 #[test]
 fn standard_files() {
-    for file in Path::new("lzma-sys/xz-5.2/tests/files").read_dir().unwrap() {
+    for file in Path::new("lzma-sys/xz-5.4/tests/files").read_dir().unwrap() {
         let file = file.unwrap();
         if file.path().extension().and_then(|s| s.to_str()) != Some("xz") {
             continue;
@@ -30,6 +30,14 @@ fn standard_files() {
         if filename.starts_with("bad") || filename.starts_with("unsupported") {
             test_bad(&contents);
         } else {
+            // Ignores `good-1-arm64-lzma2-1.xz` and `good-1-arm64-lzma2-2.xz`
+            // since they uses the ARM64 filter.
+            //
+            // Ignores `good-1-empty-bcj-lzma2.xz` since it has an empty Block
+            // that uses PowerPC BCJ and LZMA2.
+            if filename.contains("arm64") || filename == "good-1-empty-bcj-lzma2.xz" {
+                continue;
+            }
             test_good(&contents);
         }
     }
