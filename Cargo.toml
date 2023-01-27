@@ -32,5 +32,8 @@ tokio-core = "0.1.17"
 tokio = ["tokio-io", "futures"]
 static = ["lzma-sys/static"]
 
+fat-lto = ["lzma-sys/fat-lto"]
+thin-lto = ["lzma-sys/thin-lto"]
+
 [package.metadata.docs.rs]
 features = ["tokio-io", "futures"]

@@ -26,3 +26,6 @@ pkg-config = "0.3.14"
 
 [features]
 static = []
+
+fat-lto = [] # Enable fat-lto, will override thin-lto if specified
+thin-lto = [] # Enable thin-lto, will fallback to fat-lto if not supported

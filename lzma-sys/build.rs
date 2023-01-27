@@ -81,6 +81,16 @@ fn main() {
         .flag_if_supported("-Wl,--gc-sections")
         .flag_if_supported("-Wl,--icf=safe");
 
+    if cfg!(feature = "fat-lto") {
+        build.flag_if_supported("-flto");
+    } else if cfg!(feature = "thin-lto") {
+        if build.is_flag_supported("-flto=thin").unwrap_or(false) {
+            build.flag("-flto=thin");
+        } else {
+            build.flag_if_supported("-flto");
+        }
+    }
+
     build.compile("liblzma.a");
 }
 
