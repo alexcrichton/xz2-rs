@@ -77,9 +77,7 @@ fn main() {
     build
         .flag_if_supported("-ffunction-sections")
         .flag_if_supported("-fdata-sections")
-        .flag_if_supported("-fmerge-all-constants")
-        .flag_if_supported("-Wl,--gc-sections")
-        .flag_if_supported("-Wl,--icf=safe");
+        .flag_if_supported("-fmerge-all-constants");
 
     if cfg!(feature = "fat-lto") {
         build.flag_if_supported("-flto");
