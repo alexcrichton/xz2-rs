@@ -4,11 +4,6 @@ use lzma_sys;
 use std::io;
 use std::io::prelude::*;
 
-#[cfg(feature = "tokio")]
-use futures::Poll;
-#[cfg(feature = "tokio")]
-use tokio_io::{AsyncRead, AsyncWrite};
-
 use crate::stream::{Action, Check, Status, Stream};
 
 /// An xz encoder, or compressor.
@@ -119,9 +114,6 @@ impl<R: BufRead> Read for XzEncoder<R> {
     }
 }
 
-#[cfg(feature = "tokio")]
-impl<R: AsyncRead + BufRead> AsyncRead for XzEncoder<R> {}
-
 impl<W: Write> Write for XzEncoder<W> {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         self.get_mut().write(buf)
@@ -129,13 +121,6 @@ impl<W: Write> Write for XzEncoder<W> {
 
     fn flush(&mut self) -> io::Result<()> {
         self.get_mut().flush()
-    }
-}
-
-#[cfg(feature = "tokio")]
-impl<R: AsyncWrite> AsyncWrite for XzEncoder<R> {
-    fn shutdown(&mut self) -> Poll<(), io::Error> {
-        self.get_mut().shutdown()
     }
 }
 
@@ -237,9 +222,6 @@ impl<R: BufRead> Read for XzDecoder<R> {
     }
 }
 
-#[cfg(feature = "tokio")]
-impl<R: AsyncRead + BufRead> AsyncRead for XzDecoder<R> {}
-
 impl<W: Write> Write for XzDecoder<W> {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         self.get_mut().write(buf)
@@ -247,13 +229,6 @@ impl<W: Write> Write for XzDecoder<W> {
 
     fn flush(&mut self) -> io::Result<()> {
         self.get_mut().flush()
-    }
-}
-
-#[cfg(feature = "tokio")]
-impl<R: AsyncWrite> AsyncWrite for XzDecoder<R> {
-    fn shutdown(&mut self) -> Poll<(), io::Error> {
-        self.get_mut().shutdown()
     }
 }
 

@@ -30,26 +30,6 @@
 //! ```toml
 //! xz2 = { version = "0.1.6", features = ["static"] }
 //! ```
-//!
-//! # Async I/O
-//!
-//! This crate optionally can support async I/O streams with the Tokio stack via
-//! the `tokio` feature of this crate:
-//!
-//! ```toml
-//! xz2 = { version = "0.1.6", features = ["tokio"] }
-//! ```
-//!
-//! All methods are internally capable of working with streams that may return
-//! `ErrorKind::WouldBlock` when they're not ready to perform the particular
-//! operation.
-//!
-//! Note that care needs to be taken when using these objects, however. The
-//! Tokio runtime, in particular, requires that data is fully flushed before
-//! dropping streams. For compatibility with blocking streams all streams are
-//! flushed/written when they are dropped, and this is not always a suitable
-//! time to perform I/O. If I/O streams are flushed before drop, however, then
-//! these operations will be a noop.
 
 #![deny(missing_docs)]
 #![doc(html_root_url = "https://docs.rs/xz2/0.1")]

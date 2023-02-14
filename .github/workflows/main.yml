@@ -54,7 +54,6 @@ jobs:
       run: echo LZMA_API_STATIC=1 >> $GITHUB_ENV
       shell: bash
     - run: cargo test
-    - run: cargo test --features tokio
     - run: cargo run --manifest-path systest/Cargo.toml
       if: matrix.static == 'yes'
 
