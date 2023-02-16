@@ -111,7 +111,7 @@ impl<R: BufRead> Read for XzEncoder<R> {
             // If we haven't ready any data and we haven't hit EOF yet, then we
             // need to keep asking for more data because if we return that 0
             // bytes of data have been read then it will be interpreted as EOF.
-            if read == 0 && !eof && buf.len() > 0 {
+            if read == 0 && !eof && !buf.is_empty() {
                 continue;
             }
             return Ok(read);
@@ -218,8 +218,8 @@ impl<R: BufRead> Read for XzDecoder<R> {
             self.obj.consume(consumed);
 
             let status = ret?;
-            if read > 0 || eof || buf.len() == 0 {
-                if read == 0 && status != Status::StreamEnd && buf.len() > 0 {
+            if read > 0 || eof || buf.is_empty() {
+                if read == 0 && status != Status::StreamEnd && !buf.is_empty() {
                     return Err(io::Error::new(
                         io::ErrorKind::UnexpectedEof,
                         "premature eof",
