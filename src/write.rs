@@ -59,7 +59,7 @@ impl<W: Write> XzEncoder<W> {
     }
 
     fn dump(&mut self) -> io::Result<()> {
-        while self.buf.len() > 0 {
+        while !self.buf.is_empty() {
             let n = self.obj.as_mut().unwrap().write(&self.buf)?;
             self.buf.drain(..n);
         }
@@ -129,7 +129,7 @@ impl<W: Write> Write for XzEncoder<W> {
                 .unwrap();
             let written = (self.total_in() - total_in) as usize;
 
-            if written > 0 || data.len() == 0 {
+            if written > 0 || data.is_empty() {
                 return Ok(written);
             }
         }
@@ -218,7 +218,7 @@ impl<W: Write> XzDecoder<W> {
     }
 
     fn dump(&mut self) -> io::Result<()> {
-        if self.buf.len() > 0 {
+        if !self.buf.is_empty() {
             self.obj.as_mut().unwrap().write_all(&self.buf)?;
             self.buf.truncate(0);
         }
@@ -279,7 +279,7 @@ impl<W: Write> Write for XzDecoder<W> {
             let res = self.data.process_vec(data, &mut self.buf, Action::Run)?;
             let written = (self.total_in() - before) as usize;
 
-            if written > 0 || data.len() == 0 || res == Status::StreamEnd {
+            if written > 0 || data.is_empty() || res == Status::StreamEnd {
                 return Ok(written);
             }
         }

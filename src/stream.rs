@@ -9,6 +9,7 @@ use std::error;
 use std::fmt;
 use std::io;
 use std::mem;
+use std::ptr;
 use std::slice;
 
 use lzma_sys;
@@ -398,12 +399,12 @@ impl Stream {
         unsafe {
             let before = self.total_out();
             let ret = {
-                let ptr = output.as_mut_ptr().offset(len as isize);
+                let ptr = output.as_mut_ptr().add(len);
                 let out = slice::from_raw_parts_mut(ptr, cap - len);
                 self.process(input, out, action)
             };
             output.set_len((self.total_out() - before) as usize + len);
-            return ret;
+            ret
         }
     }
 
@@ -587,13 +588,19 @@ impl MatchFinder {
     }
 }
 
+impl Default for Filters {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Filters {
     /// Creates a new filter chain with no filters.
     pub fn new() -> Filters {
         Filters {
             inner: vec![lzma_sys::lzma_filter {
                 id: lzma_sys::LZMA_VLI_UNKNOWN,
-                options: 0 as *mut _,
+                options: ptr::null_mut(),
             }],
             lzma_opts: LinkedList::new(),
         }
@@ -638,7 +645,7 @@ impl Filters {
     pub fn x86(&mut self) -> &mut Filters {
         self.push(lzma_sys::lzma_filter {
             id: lzma_sys::LZMA_FILTER_X86,
-            options: 0 as *mut _,
+            options: ptr::null_mut(),
         })
     }
 
@@ -646,7 +653,7 @@ impl Filters {
     pub fn powerpc(&mut self) -> &mut Filters {
         self.push(lzma_sys::lzma_filter {
             id: lzma_sys::LZMA_FILTER_POWERPC,
-            options: 0 as *mut _,
+            options: ptr::null_mut(),
         })
     }
 
@@ -654,7 +661,7 @@ impl Filters {
     pub fn ia64(&mut self) -> &mut Filters {
         self.push(lzma_sys::lzma_filter {
             id: lzma_sys::LZMA_FILTER_IA64,
-            options: 0 as *mut _,
+            options: ptr::null_mut(),
         })
     }
 
@@ -662,7 +669,7 @@ impl Filters {
     pub fn arm(&mut self) -> &mut Filters {
         self.push(lzma_sys::lzma_filter {
             id: lzma_sys::LZMA_FILTER_ARM,
-            options: 0 as *mut _,
+            options: ptr::null_mut(),
         })
     }
 
@@ -670,7 +677,7 @@ impl Filters {
     pub fn arm_thumb(&mut self) -> &mut Filters {
         self.push(lzma_sys::lzma_filter {
             id: lzma_sys::LZMA_FILTER_ARMTHUMB,
-            options: 0 as *mut _,
+            options: ptr::null_mut(),
         })
     }
 
@@ -678,7 +685,7 @@ impl Filters {
     pub fn sparc(&mut self) -> &mut Filters {
         self.push(lzma_sys::lzma_filter {
             id: lzma_sys::LZMA_FILTER_SPARC,
-            options: 0 as *mut _,
+            options: ptr::null_mut(),
         })
     }
 
@@ -686,6 +693,12 @@ impl Filters {
         let pos = self.inner.len() - 1;
         self.inner.insert(pos, filter);
         self
+    }
+}
+
+impl Default for MtStreamBuilder {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -698,7 +711,7 @@ impl MtStreamBuilder {
                 filters: None,
             };
             init.raw.threads = 1;
-            return init;
+            init
         }
     }
 

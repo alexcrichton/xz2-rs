@@ -79,7 +79,7 @@ fn main() {
 
 fn read_dir_files(dir: &str) -> impl Iterator<Item = PathBuf> {
     fs::read_dir(dir)
-        .expect(&format!("failed to read dir {}", dir))
+        .unwrap_or_else(|_| panic!("failed to read dir {}", dir))
         .filter_map(|ent| {
             let ent = ent.expect("failed to read entry");
 
