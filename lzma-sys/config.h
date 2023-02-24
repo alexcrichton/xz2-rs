@@ -39,6 +39,8 @@
     #define MYTHREAD_POSIX 1
 #endif
 
+#define NDEBUG 1
+
 #if defined(__sun)
     #define HAVE_CLOCK_GETTIME 1
     #define HAVE_DECL_CLOCK_MONOTONIC 1
