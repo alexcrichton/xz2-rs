@@ -33,9 +33,8 @@ jobs:
             rust: stable-x86_64-msvc
             static: yes
             crt_static: yes
-          # TODO: should figure out why this is failing
-          # - os: windows-latest
-          #   rust: stable-i686-gnu
+          - os: windows-latest
+            rust: stable-i686-gnu
           - os: windows-latest
             rust: stable-x86_64-gnu
     steps:
