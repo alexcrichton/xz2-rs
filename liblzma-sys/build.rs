@@ -24,23 +24,23 @@ fn main() {
 
     let out_dir = env::var("OUT_DIR").unwrap();
     println!("cargo:root={}", out_dir);
-    let include_dir = env::current_dir().unwrap().join("xz-5.2/src/liblzma/api");
+    let include_dir = env::current_dir().unwrap().join("xz/src/liblzma/api");
     println!("cargo:include={}", include_dir.display());
 
     let mut src_files = [
-        "xz-5.2/src/liblzma/common",
-        "xz-5.2/src/liblzma/lzma",
-        "xz-5.2/src/liblzma/lz",
-        "xz-5.2/src/liblzma/check",
-        "xz-5.2/src/liblzma/delta",
-        "xz-5.2/src/liblzma/rangecoder",
-        "xz-5.2/src/liblzma/simple",
+        "xz/src/liblzma/common",
+        "xz/src/liblzma/lzma",
+        "xz/src/liblzma/lz",
+        "xz/src/liblzma/check",
+        "xz/src/liblzma/delta",
+        "xz/src/liblzma/rangecoder",
+        "xz/src/liblzma/simple",
     ]
     .iter()
     .flat_map(|dir| read_dir_files(dir))
     .chain(vec![
-        "xz-5.2/src/common/tuklib_cpucores.c".into(),
-        "xz-5.2/src/common/tuklib_physmem.c".into(),
+        "xz/src/common/tuklib_cpucores.c".into(),
+        "xz/src/common/tuklib_physmem.c".into(),
     ])
     .collect::<Vec<_>>();
 
@@ -53,15 +53,15 @@ fn main() {
         .files(src_files)
         // all C preproc defines are in `./config.h`
         .define("HAVE_CONFIG_H", "1")
-        .include("xz-5.2/src/liblzma/api")
-        .include("xz-5.2/src/liblzma/lzma")
-        .include("xz-5.2/src/liblzma/lz")
-        .include("xz-5.2/src/liblzma/check")
-        .include("xz-5.2/src/liblzma/simple")
-        .include("xz-5.2/src/liblzma/delta")
-        .include("xz-5.2/src/liblzma/common")
-        .include("xz-5.2/src/liblzma/rangecoder")
-        .include("xz-5.2/src/common")
+        .include("xz/src/liblzma/api")
+        .include("xz/src/liblzma/lzma")
+        .include("xz/src/liblzma/lz")
+        .include("xz/src/liblzma/check")
+        .include("xz/src/liblzma/simple")
+        .include("xz/src/liblzma/delta")
+        .include("xz/src/liblzma/common")
+        .include("xz/src/liblzma/rangecoder")
+        .include("xz/src/common")
         .include(env::current_dir().unwrap());
 
     if !target.ends_with("msvc") {

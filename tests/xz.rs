@@ -8,7 +8,7 @@ use liblzma::write;
 
 #[test]
 fn standard_files() {
-    for file in Path::new("lzma-sys/xz-5.2/tests/files").read_dir().unwrap() {
+    for file in Path::new("liblzma-sys/xz/tests/files").read_dir().unwrap() {
         let file = file.unwrap();
         if file.path().extension().and_then(|s| s.to_str()) != Some("xz") {
             continue;

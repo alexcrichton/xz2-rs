@@ -1,4 +1,3 @@
-[submodule "lzma-sys/xz-5.2"]
-	path = lzma-sys/xz-5.2
-	url = https://github.com/xz-mirror/xz
-	branch = v5.2
+[submodule "liblzma-sys/xz"]
+	path = liblzma-sys/xz
+	url = https://github.com/tukaani-project/xz.git

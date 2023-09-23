@@ -10,5 +10,5 @@ fn main() {
     cfg.type_name(|n, _s, _| n.to_string());
     cfg.define("LZMA_API_STATIC", None);
     cfg.skip_type(|n| n == "__enum_ty");
-    cfg.generate("../lzma-sys/src/lib.rs", "all.rs");
+    cfg.generate("../liblzma-sys/src/lib.rs", "all.rs");
 }
