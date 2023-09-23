@@ -10,7 +10,7 @@
 //!
 //! ```
 //! use std::io::prelude::*;
-//! use xz2::read::{XzEncoder, XzDecoder};
+//! use liblzma::read::{XzEncoder, XzDecoder};
 //!
 //! // Round trip some bytes from a byte source, into a compressor, into a
 //! // decompressor, and finally into a vector.
@@ -52,7 +52,6 @@
 //! these operations will be a noop.
 
 #![deny(missing_docs)]
-#![doc(html_root_url = "https://docs.rs/xz2/0.1")]
 
 pub mod stream;
 

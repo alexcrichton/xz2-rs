@@ -1,6 +1,6 @@
 //! Writer-based compression/decompression streams
 
-use lzma_sys;
+use liblzma_sys;
 use std::io;
 use std::io::prelude::*;
 
@@ -187,7 +187,7 @@ impl<W: Write> XzDecoder<W> {
     /// from the input written to it.
     pub fn new_multi_decoder(obj: W) -> XzDecoder<W> {
         let stream =
-            Stream::new_stream_decoder(u64::max_value(), lzma_sys::LZMA_CONCATENATED).unwrap();
+            Stream::new_stream_decoder(u64::max_value(), liblzma_sys::LZMA_CONCATENATED).unwrap();
         XzDecoder::new_stream(obj, stream)
     }
 

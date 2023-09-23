@@ -1,6 +1,6 @@
 //! I/O streams for wrapping `BufRead` types as encoders/decoders
 
-use lzma_sys;
+use liblzma_sys;
 use std::io;
 use std::io::prelude::*;
 
@@ -151,7 +151,7 @@ impl<R: BufRead> XzDecoder<R> {
     /// input. All the concatenated xz streams from input will be consumed.
     pub fn new_multi_decoder(r: R) -> XzDecoder<R> {
         let stream =
-            Stream::new_auto_decoder(u64::max_value(), lzma_sys::LZMA_CONCATENATED).unwrap();
+            Stream::new_auto_decoder(u64::max_value(), liblzma_sys::LZMA_CONCATENATED).unwrap();
         XzDecoder::new_stream(r, stream)
     }
 

@@ -2,9 +2,9 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 
-use xz2::read;
-use xz2::stream;
-use xz2::write;
+use liblzma::read;
+use liblzma::stream;
+use liblzma::write;
 
 #[test]
 fn standard_files() {

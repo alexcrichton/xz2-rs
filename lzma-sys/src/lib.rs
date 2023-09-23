@@ -1,5 +1,4 @@
 #![allow(bad_style)]
-#![doc(html_root_url = "https://docs.rs/lzma-sys/0.1")]
 
 use libc::{c_char, c_uchar, c_void, size_t};
 use std::u64;

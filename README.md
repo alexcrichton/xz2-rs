@@ -1,6 +1,6 @@
-# xz2
+# liblzma
 
-[Documentation](https://docs.rs/xz2)
+[Documentation](https://docs.rs/liblzma)
 
 Bindings to the liblzma implementation in Rust, also provides types to
 read/write xz streams.
@@ -8,7 +8,7 @@ read/write xz streams.
 ```toml
 # Cargo.toml
 [dependencies]
-xz2 = "0.1"
+liblzma = "0.1"
 ```
 
 
@@ -26,5 +26,5 @@ at your option.
 ### Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in xz2 by you, as defined in the Apache-2.0 license, shall be
+for inclusion in liblzma by you, as defined in the Apache-2.0 license, shall be
 dual licensed as above, without any additional terms or conditions.
