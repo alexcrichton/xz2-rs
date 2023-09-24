@@ -21,7 +21,7 @@ edition = "2018"
 libc = "0.2.51"
 
 [build-dependencies]
-cc = "1.0.34"
+cc = { version = "1.0.34", features = ["parallel"] }
 pkg-config = "0.3.14"
 
 [features]
