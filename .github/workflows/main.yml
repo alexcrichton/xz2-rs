@@ -55,6 +55,10 @@ jobs:
       shell: bash
     - run: cargo test
     - run: cargo test --features tokio
+    - run: cargo clean
+    - run: cargo test --features threading
+    - run: cargo clean
+    - run: cargo test --features tokio threading
     - run: cargo run --manifest-path systest/Cargo.toml
       if: matrix.static == 'yes'
 

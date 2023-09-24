@@ -32,6 +32,7 @@ pub struct LzmaOptions {
 }
 
 /// Builder to create a multi-threaded stream encoder.
+#[cfg(feature = "threading")]
 pub struct MtStreamBuilder {
     raw: liblzma_sys::lzma_mt,
     filters: Option<Filters>,
@@ -694,6 +695,7 @@ impl Filters {
     }
 }
 
+#[cfg(feature = "threading")]
 impl MtStreamBuilder {
     /// Creates a new blank builder to create a multithreaded encoding `Stream`.
     pub fn new() -> MtStreamBuilder {

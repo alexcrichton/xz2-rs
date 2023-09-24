@@ -36,11 +36,15 @@
 #define HAVE_MF_HC4 1
 
 #if defined(MSC_VER) || defined(WIN32) || defined(WIN64) || defined(_WIN32)
-    // change to `MYTHREAD_WIN95` if targeting Windows XP or earlier
-    #define MYTHREAD_VISTA 1
+    #if defined(LZMA_SYS_ENABLE_THREADS)
+        // change to `MYTHREAD_WIN95` if targeting Windows XP or earlier
+        #define MYTHREAD_VISTA 1
+    #endif
 #else
     #define _POSIX_C_SOURCE 199506L
-    #define MYTHREAD_POSIX 1
+    #if defined(LZMA_SYS_ENABLE_THREADS)
+        #define MYTHREAD_POSIX 1
+    #endif
 #endif
 
 #if defined(__sun)

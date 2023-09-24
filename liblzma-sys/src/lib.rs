@@ -128,6 +128,7 @@ pub struct lzma_filter {
     pub options: *mut c_void,
 }
 
+#[cfg(feature = "threading")]
 #[repr(C)]
 pub struct lzma_mt {
     pub flags: u32,
@@ -239,7 +240,9 @@ extern "C" {
         filters: *const lzma_filter,
         check: lzma_check,
     ) -> lzma_ret;
+    #[cfg(feature = "threading")]
     pub fn lzma_stream_encoder_mt_memusage(options: *const lzma_mt) -> u64;
+    #[cfg(feature = "threading")]
     pub fn lzma_stream_encoder_mt(strm: *mut lzma_stream, options: *const lzma_mt) -> lzma_ret;
 
     pub fn lzma_alone_encoder(

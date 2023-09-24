@@ -22,6 +22,8 @@ fn main() {
         return;
     }
 
+    let want_threading = cfg!(feature = "threading");
+
     let out_dir = env::var("OUT_DIR").unwrap();
     println!("cargo:root={}", out_dir);
     let include_dir = env::current_dir().unwrap().join("xz/src/liblzma/api");
@@ -44,6 +46,13 @@ fn main() {
     ])
     .collect::<Vec<_>>();
 
+    if !want_threading {
+        src_files = src_files
+            .into_iter()
+            .filter(|path| !path.file_stem().unwrap().to_str().unwrap().ends_with("mt"))
+            .collect::<Vec<_>>();
+    }
+
     // sort to make build reproducible.
     src_files.sort();
 
@@ -65,7 +74,13 @@ fn main() {
         .include(env::current_dir().unwrap());
 
     if !target.ends_with("msvc") {
-        build.flag("-std=c99").flag("-pthread");
+        build.flag("-std=c99");
+        if want_threading {
+            build.flag("-pthread");
+        }
+    }
+    if want_threading {
+        build.define("LZMA_SYS_ENABLE_THREADS", "1");
     }
 
     if let Ok(s) = env::var("CARGO_CFG_TARGET_ENDIAN") {
