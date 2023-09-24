@@ -1,5 +1,11 @@
 # liblzma
 
+[![CI](https://github.com/Portable-Network-Archive/liblzma-rs/actions/workflows/main.yml/badge.svg)](https://github.com/Portable-Network-Archive/liblzma-rs/actions/workflows/main.yml)
+[![Crates.io][crates-badge]][crates-url]
+
+[crates-badge]: https://img.shields.io/crates/v/liblzma.svg
+[crates-url]: https://crates.io/crates/liblzma
+
 [Documentation](https://docs.rs/liblzma)
 
 Bindings to the liblzma implementation in Rust, also provides types to

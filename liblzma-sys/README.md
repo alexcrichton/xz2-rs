@@ -1,5 +1,11 @@
 # liblzma-sys
 
+[![CI](https://github.com/Portable-Network-Archive/liblzma-rs/actions/workflows/main.yml/badge.svg)](https://github.com/Portable-Network-Archive/liblzma-rs/actions/workflows/main.yml)
+[![Crates.io][crates-badge]][crates-url]
+
+[crates-badge]: https://img.shields.io/crates/v/liblzma-sys.svg
+[crates-url]: https://crates.io/crates/liblzma-sys
+
 [Documentation](https://docs.rs/liblzma-sys)
 
 Raw bindings to liblzma which contains an implementation of LZMA and xz stream
