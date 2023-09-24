@@ -1,4 +1,4 @@
 #![allow(bad_style)]
-use lzma_sys::*;
+use liblzma_sys::*;
 
 include!(concat!(env!("OUT_DIR"), "/all.rs"));

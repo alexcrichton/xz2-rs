@@ -5,13 +5,13 @@ use std::net::{Shutdown, TcpListener};
 use std::thread;
 
 use futures::Future;
+use liblzma::read;
+use liblzma::write;
 use rand::Rng;
 use tokio_core::net::TcpStream;
 use tokio_core::reactor::Core;
 use tokio_io::io::{copy, shutdown};
 use tokio_io::AsyncRead;
-use xz2::read;
-use xz2::write;
 
 #[test]
 fn tcp_stream_echo_pattern() {

@@ -6,7 +6,7 @@ build = "build.rs"
 edition = "2018"
 
 [dependencies]
-lzma-sys = { path = "../lzma-sys" }
+liblzma-sys = { path = "../liblzma-sys" }
 libc = "0.2"
 
 [build-dependencies]

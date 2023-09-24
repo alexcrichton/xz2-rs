@@ -1,0 +1,28 @@
+[package]
+name = "liblzma-sys"
+version = "0.1.20"
+authors = ["Alex Crichton <alex@alexcrichton.com>", "Portable-Network-Archive Developers"]
+build = "build.rs"
+links = "lzma"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/portable-network-archive/liblzma-rs"
+homepage = "https://github.com/portable-network-archive/liblzma-rs"
+description = """
+Raw bindings to liblzma which contains an implementation of LZMA and xz stream
+encoding/decoding.
+
+High level Rust bindings are available in the `liblzma` crate.
+"""
+categories = ["external-ffi-bindings"]
+edition = "2018"
+
+[dependencies]
+libc = "0.2.51"
+
+[build-dependencies]
+cc = "1.0.34"
+pkg-config = "0.3.14"
+
+[features]
+static = []

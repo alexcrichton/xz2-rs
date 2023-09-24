@@ -10,7 +10,7 @@
 //!
 //! ```
 //! use std::io::prelude::*;
-//! use xz2::read::{XzEncoder, XzDecoder};
+//! use liblzma::read::{XzEncoder, XzDecoder};
 //!
 //! // Round trip some bytes from a byte source, into a compressor, into a
 //! // decompressor, and finally into a vector.
@@ -28,7 +28,7 @@
 //! library is not required at runtime:
 //!
 //! ```toml
-//! xz2 = { version = "0.1.6", features = ["static"] }
+//! liblzma = { version = "0.1.7", features = ["static"] }
 //! ```
 //!
 //! # Async I/O
@@ -37,7 +37,7 @@
 //! the `tokio` feature of this crate:
 //!
 //! ```toml
-//! xz2 = { version = "0.1.6", features = ["tokio"] }
+//! liblzma = { version = "0.1.7", features = ["tokio"] }
 //! ```
 //!
 //! All methods are internally capable of working with streams that may return
@@ -52,7 +52,6 @@
 //! these operations will be a noop.
 
 #![deny(missing_docs)]
-#![doc(html_root_url = "https://docs.rs/xz2/0.1")]
 
 pub mod stream;
 

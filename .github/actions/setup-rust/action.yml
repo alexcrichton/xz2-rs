@@ -1,0 +1,30 @@
+name: 'Setup Rust'
+description: 'Setup Rust by rustup'
+
+inputs:
+  channel:
+    description: 'Rust release channel[stable|beta|nightly]'
+    default: stable
+    required: false
+  target:
+    description: 'Rust build target'
+    default: ''
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Rust toolchain
+      shell: bash
+      run: |
+        rustup update --no-self-update ${{ inputs.channel }}
+        rustup default ${{ inputs.channel }}
+    - name: Echo rust version
+      shell: bash
+      run: |
+        rustc --version
+    - if: ${{ inputs.target != '' }}
+      name: Install Rust target
+      shell: bash
+      run: |
+        rustup target add ${{ inputs.target }}
