@@ -112,7 +112,7 @@ impl<R: Read> XzDecoder<R> {
     /// Create a new decompression stream, which will read compressed
     /// data from the given input stream, and decompress one xz stream.
     /// It may also consume input data that follows the xz stream.
-    /// Use [`xz::bufread::XzDecoder`] instead to process a mix of xz and non-xz data.
+    /// Use [`bufread::XzDecoder`] instead to process a mix of xz and non-xz data.
     pub fn new(r: R) -> XzDecoder<R> {
         XzDecoder {
             inner: bufread::XzDecoder::new(BufReader::new(r)),
