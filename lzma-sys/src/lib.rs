@@ -18,6 +18,7 @@ pub type lzma_check = __enum_ty;
 pub type lzma_vli = u64;
 pub type lzma_mode = __enum_ty;
 pub type lzma_match_finder = __enum_ty;
+pub type lzma_delta_type = __enum_ty;
 
 pub const LZMA_OK: lzma_ret = 0;
 pub const LZMA_STREAM_END: lzma_ret = 1;
@@ -90,6 +91,12 @@ pub const LZMA_FILTER_ARMTHUMB: lzma_vli = 0x08;
 pub const LZMA_FILTER_SPARC: lzma_vli = 0x09;
 pub const LZMA_FILTER_LZMA1: lzma_vli = 0x4000000000000001;
 pub const LZMA_FILTER_LZMA2: lzma_vli = 0x21;
+pub const LZMA_FILTER_DELTA: lzma_vli = 0x03;
+
+pub const LZMA_DELTA_TYPE_BYTE: lzma_delta_type = 0x0;
+
+pub const LZMA_DELTA_DIST_MIN: u32 = 1;
+pub const LZMA_DELTA_DIST_MAX: u32 = 256;
 
 #[repr(C)]
 pub struct lzma_allocator {
@@ -182,6 +189,19 @@ pub struct lzma_options_lzma {
     reserved_enum2: lzma_reserved_enum,
     reserved_enum3: lzma_reserved_enum,
     reserved_enum4: lzma_reserved_enum,
+    reserved_ptr1: *mut c_void,
+    reserved_ptr2: *mut c_void,
+}
+
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct lzma_options_delta {
+    pub type_: lzma_delta_type,
+    pub dist: u32,
+    reserved_int1: u32,
+    reserved_int2: u32,
+    reserved_int3: u32,
+    reserved_int4: u32,
     reserved_ptr1: *mut c_void,
     reserved_ptr2: *mut c_void,
 }

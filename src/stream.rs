@@ -31,6 +31,11 @@ pub struct LzmaOptions {
     raw: lzma_sys::lzma_options_lzma,
 }
 
+/// Options that can be used to configure the delta filter.
+pub struct DeltaOptions {
+    raw: lzma_sys::lzma_options_delta,
+}
+
 /// Builder to create a multi-threaded stream encoder.
 pub struct MtStreamBuilder {
     raw: lzma_sys::lzma_mt,
@@ -41,6 +46,7 @@ pub struct MtStreamBuilder {
 pub struct Filters {
     inner: Vec<lzma_sys::lzma_filter>,
     lzma_opts: LinkedList<lzma_sys::lzma_options_lzma>,
+    delta_opts: LinkedList<lzma_sys::lzma_options_delta>,
 }
 
 /// The `action` argument for `process`,
@@ -571,6 +577,22 @@ impl LzmaOptions {
     }
 }
 
+impl DeltaOptions {
+    /// Creates a set of options for the delta filter for a distance type of bytes.
+    pub fn new_byte(dist: u32) -> Result<DeltaOptions, Error> {
+        if dist < lzma_sys::LZMA_DELTA_DIST_MIN || dist > lzma_sys::LZMA_DELTA_DIST_MAX {
+            Err(Error::Options)
+        } else {
+            unsafe {
+                let mut options = DeltaOptions { raw: mem::zeroed() };
+                options.raw.type_ = lzma_sys::LZMA_DELTA_TYPE_BYTE;
+                options.raw.dist = dist;
+                Ok(options)
+            }
+        }
+    }
+}
+
 impl Check {
     /// Test if this check is supported in this build of liblzma.
     pub fn is_supported(&self) -> bool {
@@ -596,6 +618,7 @@ impl Filters {
                 options: 0 as *mut _,
             }],
             lzma_opts: LinkedList::new(),
+            delta_opts: LinkedList::new(),
         }
     }
 
@@ -632,7 +655,15 @@ impl Filters {
         })
     }
 
-    // TODO: delta filter
+    /// Add a filter for delta encoding.
+    pub fn delta(&mut self, opts: &DeltaOptions) -> &mut Filters {
+        self.delta_opts.push_back(opts.raw);
+        let ptr = self.delta_opts.back().unwrap() as *const _ as *mut _;
+        self.push(lzma_sys::lzma_filter {
+            id: lzma_sys::LZMA_FILTER_DELTA,
+            options: ptr,
+        })
+    }
 
     /// Add a filter for x86 binaries.
     pub fn x86(&mut self) -> &mut Filters {
@@ -854,5 +885,40 @@ impl Drop for Stream {
         unsafe {
             lzma_sys::lzma_end(&mut self.raw);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::super::write::{XzDecoder, XzEncoder};
+    use super::DeltaOptions;
+    use super::{Check, Filters, LzmaOptions, Stream};
+    use std::io::prelude::*;
+    use std::iter::repeat;
+
+    #[test]
+    fn delta_bounds() {
+        assert!(DeltaOptions::new_byte(lzma_sys::LZMA_DELTA_DIST_MIN - 1).is_err());
+        assert!(DeltaOptions::new_byte(lzma_sys::LZMA_DELTA_DIST_MAX + 1).is_err());
+        assert!(DeltaOptions::new_byte(lzma_sys::LZMA_DELTA_DIST_MIN).is_ok());
+        assert!(DeltaOptions::new_byte(lzma_sys::LZMA_DELTA_DIST_MAX).is_ok());
+    }
+
+    #[test]
+    fn stream_smoke() {
+        let mut filters = Filters::new();
+        filters.delta(&DeltaOptions::new_byte(10).unwrap());
+        filters.lzma2(&LzmaOptions::new_preset(6).unwrap());
+        let stream = Stream::new_stream_encoder(&filters, Check::Crc64).unwrap();
+
+        let d = XzDecoder::new(Vec::new());
+        let mut c = XzEncoder::new_stream(d, stream);
+        c.write_all(b"12834").unwrap();
+        let s = repeat("12345").take(100000).collect::<String>();
+        c.write_all(s.as_bytes()).unwrap();
+        let data = c.finish().unwrap().finish().unwrap();
+        assert_eq!(&data[0..5], b"12834");
+        assert_eq!(data.len(), 500005);
+        assert!(format!("12834{}", s).as_bytes() == &*data);
     }
 }
