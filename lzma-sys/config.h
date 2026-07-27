@@ -39,7 +39,7 @@
     #define MYTHREAD_POSIX 1
 #endif
 
-#if defined(__sun)
+#if defined(__sun) || defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
     #define HAVE_CLOCK_GETTIME 1
     #define HAVE_DECL_CLOCK_MONOTONIC 1
 #endif
